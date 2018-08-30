@@ -3,7 +3,7 @@ package com.stephen.learning.retrofit.controller;
 import com.stephen.learning.retrofit.model.Order;
 import com.stephen.learning.retrofit.model.User;
 import com.stephen.learning.retrofit.service.DataService;
-import com.sun.tools.corba.se.idl.constExpr.Or;
+import com.stephen.learning.retrofit.util.HttpclientUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,15 +28,24 @@ public class DataController {
     @Autowired
     private DataService dataService;
 
-    @ApiOperation("获取所有用户信息")
+    @Autowired
+    private HttpclientUtil httpclient;
+
+    @ApiOperation("retrofit-获取所有用户信息")
     @RequestMapping(value = "/users",method = RequestMethod.POST)
     public List<User> getUsers(){
        return dataService.getUsers();
     }
 
-    @ApiOperation("获取所有订单信息")
+    @ApiOperation("retrofit-获取所有订单信息")
     @RequestMapping(value = "/orders",method = RequestMethod.POST)
     public List<Order> getOrders(){
         return dataService.getOrders();
+    }
+
+    @ApiOperation("httpclient-获取所有订单信息")
+    @RequestMapping(value = "/orders2",method = RequestMethod.POST)
+    public List<Order> getOrders2(){
+        return httpclient.get("http://localhost:8090/order/queryAll",Order.class);
     }
 }
