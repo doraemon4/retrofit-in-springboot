@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -45,17 +46,36 @@ public class HttpclientUtil {
 
     /**
      *  发送post请求
-     * @param url
-     * @param map
-     * @param encoding
+     * @param url 请求路径
+     * @param queries 请求参数(路径上）
+     * @param map   请求体
+     * @param headers 请求头
+     * @param encoding 编码
      * @param clazz
      * @param <T>
      * @return
      * @throws UnsupportedEncodingException
      */
-    public <T> List<T> post(String url, Map<String,String> map, String encoding,Class<T> clazz) throws UnsupportedEncodingException {
+    public <T> List<T> post(String url,Map<String,String> queries, Map<String,String> map, Map<String,String> headers,
+                            String encoding, Class<T> clazz) throws UnsupportedEncodingException {
         CloseableHttpClient httpClient = connManager.getHttpClient();
-        HttpPost request = new HttpPost(url);
+        //设置请求路径上参数
+        StringBuilder sb = new StringBuilder(url);
+        if (queries != null && queries.keySet().size() > 0) {
+            boolean firstFlag = true;
+            Iterator iterator = queries.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry entry = (Map.Entry<String, String>) iterator.next();
+                if (firstFlag) {
+                    sb.append("?" + entry.getKey() + "=" + entry.getValue());
+                    firstFlag = false;
+                } else {
+                    sb.append("&" + entry.getKey() + "=" + entry.getValue());
+                }
+            }
+        }
+        HttpPost request = new HttpPost(sb.toString());
+
         //装填请求数据
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
         if (map != null) {
@@ -65,7 +85,14 @@ public class HttpclientUtil {
         }
         //设置参数到请求对象中
         request.setEntity(new UrlEncodedFormEntity(nvps, encoding));
-        request.setHeader("Content-type", "application/x-www-form-urlencoded");
+
+        //设置请求头
+        if(headers!=null){
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                request.addHeader(entry.getKey(), entry.getValue());
+            }
+        }
+
         CloseableHttpResponse response = null;
         return getReponse(httpClient,request,response,clazz);
     }
