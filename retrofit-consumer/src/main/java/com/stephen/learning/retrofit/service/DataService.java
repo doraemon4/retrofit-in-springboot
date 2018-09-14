@@ -1,6 +1,5 @@
 package com.stephen.learning.retrofit.service;
 
-import com.stephen.learning.retrofit.config.ApiConfig;
 import com.stephen.learning.retrofit.model.Order;
 import com.stephen.learning.retrofit.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
