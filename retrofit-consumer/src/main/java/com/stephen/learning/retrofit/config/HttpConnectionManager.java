@@ -4,6 +4,7 @@ import com.stephen.learning.retrofit.model.ProxyServerInfo;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.Registry;
@@ -12,6 +13,8 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -58,6 +61,21 @@ public class HttpConnectionManager {
                 .build();
         //如果不采用连接池就是这种方式获取连接
         //CloseableHttpClient httpClient = HttpClients.createDefault();
+        return httpClient;
+    }
+
+    /**
+     * 含有cookie
+     * @param cookie
+     * @return
+     */
+    public CloseableHttpClient getHttpClient(Cookie cookie) {
+        CookieStore cookieStore = new BasicCookieStore();
+        cookieStore.addCookie(cookie);
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .setConnectionManager(cm)
+                .setDefaultCookieStore(cookieStore)
+                .build();
         return httpClient;
     }
 
